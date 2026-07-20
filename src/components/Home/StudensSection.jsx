@@ -55,7 +55,8 @@ console.log("Students data:", students);
   return (
     <div className="bg-slate-200 py-20">
 <h2 className="text-3xl font-bold text-center mb-10">Our Students</h2>
-<div className="grid grid-cols-1 md:grid-cols-3 gap-5 m-5 ">
+{loading?<div><h5 className="text-center text-3xl font-bold">Loading...</h5></div>:
+<div className="grid grid-cols-1  md:grid-cols-3 gap-5 m-5 ">
     {students.slice(0,length).map((student) => (
 <div className="bg-white shadow-md rounded-lg relative p-6 mb-4" key={student._id}>
    {isAdmin &&  <i onClick={()=>deleteUserByAdmin(student._id)} className="fa-solid fa-trash-can absolute top-4 right-4 text-red-500 hover:text-red-600"></i>}
@@ -73,7 +74,7 @@ console.log("Students data:", students);
 </div>
 ))}
 
-</div>
+</div>}
 {students.length>6&&<p onClick={()=> {
     if (length === 6) {
       setLength(students.length);

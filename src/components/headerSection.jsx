@@ -71,7 +71,7 @@ function HeaderSection() {
 
     } catch (error) {
         console.error(error);
-        alert("User not found ");
+        alert("User:",error);
         
     }
     finally {
@@ -208,17 +208,19 @@ useEffect(()=>{
 
           {
   user ? (
-    <div className="flex items-center cursor-pointer gap-3">
+   <NavLink to='/Profile' className={({ isActive }) => isActive ? "text-yellow-300 font-bold" : "text-white"}>
+     <div className="flex items-center cursor-pointer gap-3">
       <img
         src={user.profilePicture}
         alt=""
         className="w-10 h-10 rounded-full object-cover"
       />
 
-      <span className="text-white font-semibold">
+      <span className="font-semibold">
         {user.userName}
       </span>
     </div>
+   </NavLink>
   ) : (
     <div className="flex gap-3">
       <button

@@ -4,6 +4,7 @@ import AboutPage from './pages/AboutPage.jsx'
 import ProjectPage from './pages/ProjectsPage.jsx'
 import ContactPage from './pages/ContactPage.jsx'
 import OutletPage from './pages/OutletPage.jsx'
+import ProfilePage from './pages/ProfilePage.jsx'
 function RouterPage(){
     return (
         <BrowserRouter>
@@ -13,6 +14,8 @@ function RouterPage(){
             <Route path='/About' element={<AboutPage/>}/>
             <Route path='/Projects' element={<ProjectPage/>}/>
             <Route path='/Contact' element={<ContactPage/>}/>
+            <Route path='/Profile' element={<ProfilePage/>}/>
+
             </Route>
         </Routes>
         </BrowserRouter>
