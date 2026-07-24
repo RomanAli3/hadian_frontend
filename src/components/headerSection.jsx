@@ -201,9 +201,7 @@ useEffect(()=>{
                 About Us
               </NavLink>
 
-              <NavLink to="/Contact" className={navClass}>
-                Contact
-              </NavLink>
+             
             </div>
 
           {
@@ -311,13 +309,7 @@ useEffect(()=>{
               About Us
             </NavLink>
 
-            <NavLink
-              onClick={() => setMenuOpen(false)}
-              to="/Contact"
-              className={navClass}
-            >
-              Contact
-            </NavLink>
+          
 
            {
   user ? (

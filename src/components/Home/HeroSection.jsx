@@ -1,5 +1,8 @@
 
 function HeroSection(){
+
+
+ 
     return(
        <main className="min-h-[90vh] bg-linear-to-r from-[#081529] via-[#0b1e3f] to-[#081529] flex items-center">
 

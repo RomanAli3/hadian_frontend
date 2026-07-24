@@ -1,7 +1,16 @@
 import { AuthContext } from "../UserContext"
-import { useContext, useState } from "react"
+import { ProjectContext } from "../ProjectContext"
+import { useContext, useState,useEffect } from "react"
 function ProfilePage(){
     const {user,setUser} = useContext(AuthContext)
+        const {projects,setProjects} =useContext(ProjectContext)
+        const [myProjects,setMyProjects]=useState([])
+        
+            useEffect(()=>{
+              setProjects(projects)
+            },[projects])
+        
+
     const [profileisOpen,setProfileIsOpen]=useState(false)
     const [profilePic,setProfilePic]=useState(null)
       const [loading, setLoading] = useState(false);
@@ -52,13 +61,87 @@ function ProfilePage(){
             setProfileIsOpen(false)
             console.log(data)
           } catch (error) {
-            alert("Error",error.message)
+            alert("Error: Please Change Time Zone ")
+          }
+          finally{
+            setLoading(false)
+            window.location.reload()
+          }
+
+         }
+
+
+           const deleteUserByAdmin=async(userId)=>{
+
+               const confirmDelete = window.confirm("Are you sure you want to delete this user?");
+
+    if (!confirmDelete) return;
+            try {
+                const response = await fetch (`http://localhost:8000/user/delete/${userId}`,{
+                    method:"DELETE",
+                    credentials:"include"
+                })
+
+                const data = await response.json()
+              
+                alert("User Delete Successfully")
+            } catch (error) {
+                console.log(error)
+                alert(error)
+            }
+            finally{
+                   getAllStudents();
+            }
+
+        }
+
+
+         const [oldPassword,setOldPassword]=useState('')
+         const [newPassword,setNewPassword]=useState('')
+         const [passwordChangeisOpen,setPasswordChangeopen]=useState(false)
+
+         const handleChangePassword=async(e)=>{
+          e.preventDefault()
+
+          if(!oldPassword.trim()||!newPassword.trim()){
+            alert("Please enter all fields")
+          }
+
+          try {
+            setLoading(true)
+            const response =await fetch("http://localhost:8000/user/change-password",{
+              method:"PATCH",
+              credentials:"include",
+              headers:{
+             "Content-Type": "application/json"
+          },
+          body:JSON.stringify({
+            oldPassword:oldPassword,
+            newPassword:newPassword
+          })
+            })
+
+            
+            const data = await response.json()
+
+            if(response.ok){
+              alert("Password change successfully")
+            }
+            setOldPassword("")
+            setNewPassword("")
+            
+          } catch (error) {
+            console.log(error)
+            alert("error while changing password")
           }
           finally{
             setLoading(false)
           }
 
+
          }
+
+
 
     const handleChangeProfilePIc=async(e)=>{
          e.preventDefault();
@@ -123,30 +206,105 @@ function ProfilePage(){
         window.location.reload()
       }
     }
+     const deleteProjectByAdmin=async(projectId)=>{
+
+               const confirmDelete = window.confirm("Are you sure you want to delete this Project?");
+
+    if (!confirmDelete) return;
+            try {
+                const response = await fetch (`http://localhost:8000/project/delete-project/${projectId}`,{
+                    method:"DELETE",
+                    credentials:"include"
+                })
+
+                const data = await response.json()
+              
+                alert("Project Delete Successfully")
+            } catch (error) {
+                console.log(error)
+                alert(error)
+            }
+            finally{
+                window.location.reload()
+            }
+
+        }
     return(
         <main>
             <div className="min-h-screen">
-<div className="">
-{user?<div className="border-b border-slate-400"><br/>
-<div className="flex gap-3 flex-col text-center  items-center">
-    <span className="relative"><i onClick={()=>setProfileIsOpen(true)} className="fa-regular fa-camera z-40 relative top-23 left-7 border rounded-full  text-white  cursor-pointer"></i><img className="h-25 border-2 border-blue-400 w-25 rounded-full" src={user.profilePicture} />   </span>
-<span><h4>@{user.userName}</h4>
-<h4 className="text-semibold text-xl"><strong>Full Name:</strong> {user.fullName} <i onClick={()=>setFullNameChangeopen(true)} className="fa-solid fa-pencil text-sm hover:text-slate-700 cursor-pointer"></i></h4>
-</span>
-<span><h4>{user.email}</h4></span>
-</div><br/>
-<div className="p-3 text-center text-white shadow bg-slate-800 justify-center flex flex-wrap gap-5"><span className="p-4 border rounded-md shadow-lg"> <strong>Skills : </strong>{user.skills}  
+<div className="bg-linear-to-r from-slate-900 to-slate-800 text-white shadow-lg">
+  {user ? (
+    <>
+      <div className="max-w-6xl mx-auto py-10 px-5">
 
-</span> <span className="p-4 border rounded-md shadow-lg"><strong>Experience : </strong>{user.experience} year</span>
-<span className="p-4 border rounded-md shadow-lg"><strong>Number : </strong>{user.phoneNumber}</span>
-<span className="p-4 border rounded-md shadow-lg"><strong>Course : </strong>{user.course}</span>
+        {/* Profile */}
+        <div className="flex flex-col items-center">
 
-</div>
-</div>:
-<div className="h-full w-full flex justify-center items-center">
-    <h5 className="text-3xl font-bold">Loading...</h5>
-</div>
- }
+          <div className="relative">
+            <img
+              src={user.profilePicture}
+              className="h-32 w-32 rounded-full border-4 border-blue-500 object-cover shadow-xl"
+            />
+
+            <button
+              onClick={() => setProfileIsOpen(true)}
+              className="absolute bottom-1 right-1 h-9 w-9 rounded-full bg-blue-600 hover:bg-blue-700 transition flex items-center justify-center"
+            >
+              <i className="fa-solid fa-camera text-white text-sm"></i>
+            </button>
+          </div>
+
+          <h4 className="mt-4 text-gray-300 text-lg">
+            @{user.userName}
+          </h4>
+
+          <h2 className="text-3xl font-bold flex items-center gap-2">
+            {user.fullName}
+            <i
+              onClick={() => setFullNameChangeopen(true)}
+              className="fa-solid fa-pen-to-square text-lg cursor-pointer hover:text-blue-400"
+            ></i>
+          </h2>
+
+          <p className="text-gray-400 mt-2">
+            {user.email}
+          </p>
+        </div>
+
+        {/* Cards */}
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-5 mt-10">
+
+          <div className="bg-slate-700 rounded-xl p-5 text-center shadow">
+            <h5 className="text-gray-300">Skills</h5>
+            <p className="font-bold mt-2">{user.skills}</p>
+          </div>
+
+          <div className="bg-slate-700 rounded-xl p-5 text-center shadow">
+            <h5 className="text-gray-300">Experience</h5>
+            <p className="font-bold mt-2">{user.experience} Year</p>
+          </div>
+
+          <div className="bg-slate-700 rounded-xl p-5 text-center shadow">
+            <h5 className="text-gray-300">Phone</h5>
+            <p className="font-bold mt-2">{user.phoneNumber}</p>
+          </div>
+
+          <div className="bg-slate-700 rounded-xl p-5 text-center shadow">
+            <h5 className="text-gray-300">Course</h5>
+            <p className="font-bold mt-2">{user.course}</p>
+          </div>
+
+        </div>
+
+      </div>
+    </>
+  ) : (
+    <div className="h-screen flex justify-center items-center">
+      <h2 className="text-3xl font-bold text-white animate-pulse">
+        Loading...
+      </h2>
+    </div>
+  )}
 </div>
 <br/>
 <div className="border rounded-md m-2 min-h-[70vh] border-slate-300"><br/>
@@ -154,13 +312,39 @@ function ProfilePage(){
 <div className=" flex justify-between m-5 items-center ">
 <span>
 <h4 className="text-2xl font-bold text-center">My Projects</h4>
-
   </span>
  <button onClick={()=>setProjectCreateOpen(true)} className=" text-center text-slate-800 cursor-pointer hover:text-slate-700 flex border rounded-lg p-2"><i class="fa-solid fa-circle-plus text-2xl"></i>
 <p>Create Project</p>
 </button>
 </div>
-
+ <div className="grid grid-cols-1 md:grid-cols-3 gap-4 m-4">
+       {projects
+    ?.filter(project => project.owner === user?._id)
+    .map(project => (
+            <div className="bg-slate-100 relative rounded-2xl shadow" key={project._id}>
+                      <i onClick={()=>deleteProjectByAdmin(project._id)} className="fa-solid fa-trash-can absolute top-4 right-4 text-red-500 hover:text-red-600"></i>
+                    <img className="w-full rounded-t-2xl" src={project?.image}/>
+                   
+                    <div className="m-4">
+                        <p className=" text-lg font-semibold">{project.title}</p>
+                        <p className="">{project.description}</p>
+                        <span><strong>Skills : </strong>{project.skills}</span><br/>
+                 
+                  <br/>
+                   {project.video&&(
+                     <a target="_blank" className="underline cursor-pointer hover:text-blue-700" href={project.video}>
+                       Watch Video
+                    </a>
+                   )}
+                
+                        </div>
+                 </div>
+         )
+        )}
+  </div></div>
+  <div className="m-5 flex gap-3">
+    <button className="bg-slate-100 cursor-pointer rounded-lg border p-3" onClick={()=>setPasswordChangeopen(true)}>Change Password</button>
+    <button className="bg-slate-100 cursor-pointer rounded-lg border p-3"  onClick={()=>deleteUserByAdmin(user._id)}>Delete Account</button>
   </div>
   </div>
 {
@@ -255,12 +439,20 @@ function ProfilePage(){
   htmlFor="projectVideo"
   className="block w-full cursor-pointer p-2 mb-4 rounded-md border border-gray-300 text-gray-400 hover:border-blue-500"
 >
-  {projectVideo ? projectVideo.name : "Choose Video"}
+  {projectVideo ? "Video added" : "Choose Video"}
 </label>
           </div>
 <button type="submit" className="bg-yellow-400 w-full cursor-pointer hover:bg-amber-400/80 p-2 rounded-md">Create Project</button>
 
-        <button onClick={()=>setProjectCreateOpen(false)} type='button' className="absolute hover:text-red-600 top-2 right-2 cursor-pointer" ><i className="fa-solid fa-xmark"></i></button>
+        <button onClick={()=>{
+           setProjectTitle('')
+              setProjectSkills("")
+              setProjectDescription('')
+              setProjectVideo(null)
+              setProjectImage(null)
+          setProjectCreateOpen(false)
+
+        }} type='button' className="absolute hover:text-red-600 top-2 right-2 cursor-pointer" ><i className="fa-solid fa-xmark"></i></button>
         </form>
 
         </div>
@@ -309,6 +501,60 @@ function ProfilePage(){
     </div>
 )}
 
+
+{passwordChangeisOpen&&(
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
+      <div className="relative w-96 bg-gray-800 rounded-lg shadow-xl p-6">
+
+        <button
+          onClick={() => {
+            setPasswordChangeopen(false)
+            setOldPassword("")
+            setNewPassword("")
+          }}
+          type="button"
+          className="absolute top-3 right-3 text-gray-400 hover:text-red-500"
+        >
+          <i className="fa-solid fa-xmark text-lg"></i>
+        </button>
+
+        <h2 className="text-2xl font-bold text-white text-center">
+          Change Password
+        </h2>
+
+        <form onSubmit={handleChangePassword} className="mt-6">
+
+          <input
+          placeholder="Old Password"
+            id="profile"
+            type="text"
+            className="px-2 py-1.5 w-full outline-1 rounded-lg text-white outline-white"
+            
+            value={oldPassword}
+            onChange={(e) => setOldPassword(e.target.value)}
+          />
+
+           <input
+          placeholder="New Password"
+            id="profile"
+            type="text"
+            className="px-2 mt-4 py-1.5 w-full outline-1 rounded-lg text-white outline-white"
+            
+            value={newPassword}
+            onChange={(e) => setNewPassword(e.target.value)}
+          />
+
+          <button
+            type="submit"
+            className="w-full mt-5 bg-yellow-400 text-blue-900 py-2 rounded-md font-semibold hover:bg-yellow-500 transition"
+          >
+            Update Password
+          </button>
+
+        </form>
+      </div>
+    </div>
+)}
    {
     loading && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/30">

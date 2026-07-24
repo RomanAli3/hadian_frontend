@@ -54,7 +54,7 @@ console.log("Students data:", students);
         }
   return (
     <div className="bg-slate-200 py-20">
-<h2 className="text-3xl font-bold text-center mb-10">Our Students</h2>
+<h2 className="text-3xl font-bold text-center mb-10">All Users</h2>
 {loading?<div><h5 className="text-center text-3xl font-bold">Loading...</h5></div>:
 <div className="grid grid-cols-1  md:grid-cols-3 gap-5 m-5 ">
     {students.slice(0,length).map((student) => (
