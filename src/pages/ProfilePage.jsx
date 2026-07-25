@@ -1,7 +1,10 @@
 import { AuthContext } from "../UserContext"
 import { ProjectContext } from "../ProjectContext"
-import { useContext, useState,useEffect } from "react"
+import { useContext, useState,useEffect, } from "react"
+
 function ProfilePage(){
+
+  
     const {user,setUser} = useContext(AuthContext)
         const {projects,setProjects} =useContext(ProjectContext)
         const [myProjects,setMyProjects]=useState([])
@@ -73,7 +76,7 @@ function ProfilePage(){
 
            const deleteUserByAdmin=async(userId)=>{
 
-               const confirmDelete = window.confirm("Are you sure you want to delete this user?");
+               const confirmDelete = window.confirm("Are you sure you want to delete your account?");
 
     if (!confirmDelete) return;
             try {
@@ -90,9 +93,35 @@ function ProfilePage(){
                 alert(error)
             }
             finally{
+                window.location.href = "/";            
                    getAllStudents();
             }
 
+        }
+
+        const logoutUser= async()=>{
+          
+               const confirmDelete = window.confirm("Are you sure you want to logout account?");
+
+    if (!confirmDelete) return;
+          setLoading(true)
+       try {
+           const response=await fetch("http://localhost:8000/user/logout",{
+             method:"POST",
+             credentials:"include",
+             headers:{
+             "Content-Type": "application/json"
+          },
+            })
+ 
+             const data = await response.json()
+       } catch (error) {
+        console.log("error",error)
+       }
+       finally{
+        setLoading(false)
+        window.location.href='/'
+       }
         }
 
 
@@ -344,6 +373,8 @@ function ProfilePage(){
   </div></div>
   <div className="m-5 flex gap-3">
     <button className="bg-slate-100 cursor-pointer rounded-lg border p-3" onClick={()=>setPasswordChangeopen(true)}>Change Password</button>
+    <button className="bg-slate-100 cursor-pointer rounded-lg border p-3"  onClick={()=>logoutUser()}>Logout</button>
+
     <button className="bg-slate-100 cursor-pointer rounded-lg border p-3"  onClick={()=>deleteUserByAdmin(user._id)}>Delete Account</button>
   </div>
   </div>
